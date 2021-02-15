@@ -54,12 +54,7 @@ if (!class_exists('VcDishesBlock')) {
             ), $atts));
 
             $result = $atts['data_dishes_block'];
-
-            $result = str_replace('``', '"', $result);
-            $result = str_replace('`{`', '[', $result);
-            $result = str_replace('`}`', ']', $result);
-
-            $data = json_decode($result);
+            $data = json_decode(urldecode($result));
 
             include( plugin_dir_path( __FILE__ ) . '/templates/block-default.php' );
 
@@ -71,6 +66,32 @@ if (!class_exists('VcDishesBlock')) {
     vc_add_shortcode_param('data_dishes_block', 'data_dishes_block_settings_field', plugin_dir_url(__FILE__) . '/dishes.js?' . uniqid());
     function data_dishes_block_settings_field($settings, $value){
         return "
+
+
+        <div class='modal micromodal-slide' id='modal-settings' aria-hidden='true'>
+        <div class='modal__overlay' tabindex='-1' data-micromodal-close>
+          <div class='modal__container' role='dialog' aria-modal='true' aria-labelledby='modal-settings-title'>
+            <header class='modal__header'>
+              <h2 class='modal__title' id='modal-settings-title'>
+                Actualización de cabecera
+              </h2>
+              <button class='modal__close' aria-label='Close modal' data-micromodal-close></button>
+            </header>
+            <main class='modal__content' id='modal-settings-content'>
+              <p>
+                <form id='dishes-modal-settings'>
+                <input type='text' name='header'>
+                </form>
+              </p>
+            </main>
+            <footer class='modal__footer'>
+              <button class='modal__btn modal__btn-primary' data-micromodal-close data-rel='save'>Guardar</button>
+            </footer>
+          </div>
+        </div>
+      </div>
+
+
         <button id='add-row'>Add row</button>
         <button id='delete-row'>Delete row</button>
         <button id='savedata'>Save data</button>
