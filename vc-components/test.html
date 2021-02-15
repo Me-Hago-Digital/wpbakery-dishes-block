@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="assets/tabulator/css/tabulator.min.css" rel="stylesheet">
+
+    <style>
+        .hide{
+            /*display:none;*/
+        }
+
+        .dish-block-desc textarea{
+            width: 100%;
+        }
+
+    </style>
+
+</head>
+<body>
+    
+    <input type="hidden" class="wpb_vc_param_value my_param_field my_param_dishes">
+    <input type="hidden" class="wpb_vc_param_value my_param_table_field">
+
+    <button id="add-row">Add row</button>
+    <button id="delete-row">Delete row</button>
+    <button id="savedata">Save data</button>
+    <input id="files" type="file">
+
+
+    <div id="example-table"></div>
+
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="assets/tabulator/js/tabulator.min.js"></script>
+    <script src="dishes.js"></script>
+
+</body>
+</html>
