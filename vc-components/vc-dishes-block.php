@@ -63,9 +63,12 @@ if (!class_exists('VcDishesBlock')) {
 
 
             $new_headers = [];
+            $params['order']=[];
 
             foreach($params['headers'] as $x){
-              if(isset($x->field)){
+              if(isset($x->field)&&$x->field!="handler"){
+                echo $x->field."<br>";
+                array_push($params['order'],$x->field);
                 $new_headers[$x->field]=$x;
               }
             }
