@@ -1,4 +1,4 @@
-var dummy_data='{"headers":[{"formatter":"rowSelection","titleFormatter":"rowSelection","headerSort":false,"width":50,"htmlOutput":false,"editor":false},{"field":"handler","width":50,"headerSort":false,"rowHandle":true,"htmlOutput":false,"editor":false},{"title":"Plato","field":"texto_1613413991741","headerSort":false,"rowHandle":true,"htmlOutput":false,"editor":true,"editableTitle":true,"headerContextMenu":[{"label":"Cambiar nombre1"},{"label":"Ordenar columna ASC"},{"label":"Ordenar columna DESC"},{"label":"Eliminar columna"}]},{"title":"Descripción","field":"texto_1613413991696","headerSort":false,"rowHandle":true,"htmlOutput":false,"editor":true,"editableTitle":true,"headerContextMenu":[{"label":"Cambiar nombre1"},{"label":"Ordenar columna ASC"},{"label":"Ordenar columna DESC"},{"label":"Eliminar columna"}]},{"title":"Precio","field":"price_1613413991494","headerSort":false,"rowHandle":true,"htmlOutput":false,"editor":true,"editableTitle":true,"width":100,"headerContextMenu":[{"label":"Cambiar nombre1"},{"label":"Ordenar columna ASC"},{"label":"Ordenar columna DESC"},{"label":"Eliminar columna"}]}],"data":[{"id":3,"subtable":false,"texto_1613413991741":"1","texto_1613413991696":"2","price_1613413991494":"Loading"},{"id":2,"texto_1613413991741":"3","texto_1613413991696":"4","price_1613413991494":"Loading2","subtable":false},{"id":1,"texto_1613413991741":"5","texto_1613413991696":"6","price_1613413991494":"Loading3","subtable":false}]}';
+var dummy_data='{"headers":[{"field":"handler","width":10,"headerSort":false,"rowHandle":true,"htmlOutput":false,"editor":false,"formatter":"handle"},{"formatter":"rowSelection","titleFormatter":"rowSelection","headerSort":false,"width":10,"htmlOutput":false,"editor":false},{"title":"Plato","field":"texto_1613501370658","headerSort":false,"htmlOutput":false,"editor":"input","editableTitle":true,"headerContextMenu":[{"disabled":true,"label":"Settings"},{"label":"Ordenar columna ASC"},{"label":"Ordenar columna DESC"},{"disabled":true,"label":"Eliminar columna"},{}]},{"title":"Descripción","field":"texto_1613501370094","headerSort":false,"htmlOutput":false,"editor":"input","editableTitle":true,"headerContextMenu":[{"disabled":true,"label":"Settings"},{"label":"Ordenar columna ASC"},{"label":"Ordenar columna DESC"},{"disabled":true,"label":"Eliminar columna"},{}]},{"title":"Ración","field":"price_1613501370139","headerSort":false,"htmlOutput":true,"editor":"input","editableTitle":true,"width":100,"headerContextMenu":[{"disabled":true,"label":"Settings"},{"label":"Ordenar columna ASC"},{"label":"Ordenar columna DESC"},{"disabled":true,"label":"Eliminar columna"},{}]},{"title":"½ Ración","field":"price_1613501370165","headerSort":false,"htmlOutput":true,"editor":"input","editableTitle":true,"width":100,"headerContextMenu":[{"disabled":true,"label":"Settings"},{"label":"Ordenar columna ASC"},{"label":"Ordenar columna DESC"},{"disabled":true,"label":"Eliminar columna"},{}]}],"data":[{"id":1,"subtable":false,"texto_1613501370658":"1","texto_1613501370094":"2"}]}';
 
 
 
@@ -17,16 +17,35 @@ jQuery(document).ready(function ($) {
     awaitCloseAnimation: false,
   });
 
+
+  var cellClassFormatter = function(cell, formatterParams, onRendered){
+
+    onRendered(function(){
+
+      if(typeof cell._cell !== "undefined"){
+        if(!cell._cell.column.definition.htmlOutput){
+          $(cell.getElement()).addClass('customcss')
+        }
+      }
+
+    });
+
+    return cell.getValue(); //return the contents of the cell;
+  };
+
+
   function definitions_header_text(params={}){
     return{
       title: typeof params.title !== "undefined"?params.title:'Titulo',
       field:typeof params.field !== "undefined"?params.field:'texto_'+random_uuid(),
       headerSort: false,
-      rowHandle: true,
-      htmlOutput: true,   
+      htmlOutput: typeof params.htmlOutput !== "undefined"?params.htmlOutput:true,
       editor: true,
       editableTitle:true, 
       headerContextMenu: headerContextMenu,
+      formatter:cellClassFormatter,
+      editor:"input"
+     
     }
   }
 
@@ -35,12 +54,13 @@ jQuery(document).ready(function ($) {
       title:typeof params.title !== "undefined"?params.title:'Precio',
       field:typeof params.field !== "undefined"?params.field:'price_'+random_uuid(),
       headerSort: false,
-      rowHandle: true,
-      htmlOutput: true,  
+      htmlOutput: typeof params.htmlOutput !== "undefined"?params.htmlOutput:true,  
       editor: true,
       editableTitle:true,
       width:100,
       headerContextMenu: headerContextMenu,
+      formatter:cellClassFormatter,
+      editor:"input"
     }  
   }
 
@@ -50,7 +70,8 @@ jQuery(document).ready(function ($) {
 
   var headerContextMenu = [
     {
-      label: "Cambiar nombre1",
+      disabled:true,
+      label: "Settings",
       action: function (e, column) {
         openColSettings(column);
       },
@@ -70,6 +91,7 @@ jQuery(document).ready(function ($) {
       },
     },
     {
+      disabled:true,
       label: "Eliminar columna",
       action: function (e, column) {
  
@@ -86,25 +108,27 @@ jQuery(document).ready(function ($) {
         
       },
     },
-/*     {
+    {
       label: function (component) {
-        return table.columnManager.columnsByField.extra.visible
-          ? "Ocultar descripción"
-          : "Mostrar descripción";
+
+        console.log(component._column.definition)
+
+        return !component._column.definition.htmlOutput
+          ? "Mostrar columna"
+          : "Ocultar columna";
       },
       action: function (e, column) {
-        if (table.columnManager.columnsByField.extra.visible) {
-          table.columnManager.columnsByField.extra.hide();
-        } else {
-          table.columnManager.columnsByField.extra.show();
-        }
+
+          column._column.definition.htmlOutput=!column._column.definition.htmlOutput;
+
+          $.each(column._column.cells,function(i,x){
+            $(x.element).toggleClass("customcss")
+          })
+        saveData(table);
         table.redraw();
       },
-    }, */
+    },
   ];
-
-
-
 
   var rowContextMenu = [
     {
@@ -200,8 +224,7 @@ jQuery(document).ready(function ($) {
     saveData(table);
   });
   $("#savedata").click(function () {
-    console.log(table.getHtml())
-    saveData(table);
+    console.log(saveData(table))
   });
   $("body").on("blur", "textarea", function () {
     var id = parseInt($(this).attr("data-rel"));
@@ -235,30 +258,34 @@ jQuery(document).ready(function ($) {
 
   function loadHeaders(saved_headers=[]) {
 
-    var min_headers = [{
+    var min_headers = [
+      {
+        field: "handler",
+        width: 10,
+        headerSort: false,
+        rowHandle: true,
+        htmlOutput: false,
+        editor:false,
+        formatter:"handle"
+      },
+      
+      {
       formatter: "rowSelection",
       titleFormatter: "rowSelection",
       headerSort: false,
       cellClick: function (e, cell) {
         cell.getRow().toggleSelect();
       },
-      width: 50,
-      htmlOutput: false,
-      editor:false
-    },
-    {
-      field: "handler",
-      width: 50,
-      headerSort: false,
-      rowHandle: true,
+      width: 10,
       htmlOutput: false,
       editor:false
     }]
 
     var default_headers = [
-      definitions_header_text({title:'Plato'}),
-      definitions_header_text({title:'Descripción'}),
-      definitions_header_price({title:'Precio'})
+      definitions_header_text({title:'Plato',field:"texto_plato"}),
+      definitions_header_text({title:'Descripción',field:"texto_desc"}),
+      definitions_header_price({title:'Ración',field:"number_precio1"}),
+      definitions_header_price({title:'½ Ración',field:"number_precio2"})
     ];
 
     var headers = [{}];
@@ -268,14 +295,16 @@ jQuery(document).ready(function ($) {
 
       var formated_headers = [];
 
+      console.log(saved_headers);
+
       $.each(saved_headers,function(i,x){
         //TEXTO
         if(x.field.search('texto')!==-1){
-          formated_headers.push(definitions_header_text({title:x.title,field:x.field}));
+          formated_headers.push(definitions_header_text({title:x.title,field:x.field,htmlOutput:x.htmlOutput}));
         }
         //PRECIO
-        else  if(x.field.search('price')!==-1){
-          formated_headers.push(definitions_header_price({title:x.title,field:x.field}));
+        else  if(x.field.search('number')!==-1){
+          formated_headers.push(definitions_header_price({title:x.title,field:x.field,htmlOutput:x.htmlOutput}));
         }
       })
 

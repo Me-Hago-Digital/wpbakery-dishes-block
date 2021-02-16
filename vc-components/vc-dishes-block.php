@@ -56,6 +56,22 @@ if (!class_exists('VcDishesBlock')) {
             $result = $atts['data_dishes_block'];
             $data = json_decode(urldecode($result));
 
+            $params=[
+              'headers'=>$data->headers,
+              'data'=>$data->data
+            ];
+
+
+            $new_headers = [];
+
+            foreach($params['headers'] as $x){
+              if(isset($x->field)){
+                $new_headers[$x->field]=$x;
+              }
+            }
+
+            $params['headers'] = $new_headers;
+
             include( plugin_dir_path( __FILE__ ) . '/templates/block-default.php' );
 
             return ob_get_clean();

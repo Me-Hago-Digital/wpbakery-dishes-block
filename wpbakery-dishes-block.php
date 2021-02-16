@@ -20,5 +20,10 @@ function enqueue_tabulator_js() {
 	wp_enqueue_style( 'wpbakery-dishes-block', plugin_dir_url( __FILE__ ) . '/vc-components/assets/styles.css"',false,'1.1','all');
 }
 
+add_action('wp_enqueue_scripts', 'wpbakery_dishes_block_styles',9999,1 );
+function wpbakery_dishes_block_styles() {
+	wp_enqueue_style( 'dishes_block', plugin_dir_url( __FILE__ ) . '/vc-components/assets/styles.css',false,'1.1','all');
+}
+
 include( plugin_dir_path( __FILE__ ) . '/vc-components/vc-dishes-block.php' );
 
