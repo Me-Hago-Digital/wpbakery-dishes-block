@@ -67,7 +67,6 @@ if (!class_exists('VcDishesBlock')) {
 
             foreach($params['headers'] as $x){
               if(isset($x->field)&&$x->field!="handler"){
-                echo $x->field."<br>";
                 array_push($params['order'],$x->field);
                 $new_headers[$x->field]=$x;
               }
@@ -113,7 +112,6 @@ if (!class_exists('VcDishesBlock')) {
 
         <button id='add-row'>Add row</button>
         <button id='delete-row'>Delete row</button>
-        <button id='savedata'>Save data</button>
 
         <div id='data_dishes_block_table'></div>
 
