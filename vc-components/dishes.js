@@ -1,21 +1,44 @@
-var dummy_data='{"headers":[{"field":"handler","width":10,"headerSort":false,"rowHandle":true,"htmlOutput":false,"editor":false,"formatter":"handle"},{"formatter":"rowSelection","titleFormatter":"rowSelection","headerSort":false,"width":10,"htmlOutput":false,"editor":false},{"title":"Plato","field":"texto_1613501370658","headerSort":false,"htmlOutput":false,"editor":"input","editableTitle":true,"headerContextMenu":[{"disabled":true,"label":"Settings"},{"label":"Ordenar columna ASC"},{"label":"Ordenar columna DESC"},{"disabled":true,"label":"Eliminar columna"},{}]},{"title":"Descripción","field":"texto_1613501370094","headerSort":false,"htmlOutput":false,"editor":"input","editableTitle":true,"headerContextMenu":[{"disabled":true,"label":"Settings"},{"label":"Ordenar columna ASC"},{"label":"Ordenar columna DESC"},{"disabled":true,"label":"Eliminar columna"},{}]},{"title":"Ración","field":"price_1613501370139","headerSort":false,"htmlOutput":true,"editor":"input","editableTitle":true,"width":100,"headerContextMenu":[{"disabled":true,"label":"Settings"},{"label":"Ordenar columna ASC"},{"label":"Ordenar columna DESC"},{"disabled":true,"label":"Eliminar columna"},{}]},{"title":"½ Ración","field":"price_1613501370165","headerSort":false,"htmlOutput":true,"editor":"input","editableTitle":true,"width":100,"headerContextMenu":[{"disabled":true,"label":"Settings"},{"label":"Ordenar columna ASC"},{"label":"Ordenar columna DESC"},{"disabled":true,"label":"Eliminar columna"},{}]}],"data":[{"id":1,"subtable":false,"texto_1613501370658":"1","texto_1613501370094":"2"}]}';
-
-
+var dummy_data='';
 
 jQuery(document).ready(function ($) {
 
+  if(typeof ajax_var === "undefined"){
+    console.log('undefined ajax_var!!!');
+    var ajax_var = {
+      url: "/wp-admin/admin-ajax.php",
+      action:"update_dishes_block_default_template",
+      nonce: "ABCDEF"
+    }
+  }
+
+
   var $param_elem = $('[type="hidden"].data_dishes_block');
+  var $param_elem_default_template = $('input[name="data_dishes_block_default_template"]');
   var $param_elem_table = $('[type="hidden"].data_dishes_block_table_field');
   var test =
     $param_elem.length === 0 || $param_elem_table.length === 0 ? true : false;
 
   var rowid = 0;
 
+  var default_template = '';
+
+
   MicroModal.init({
     disableScroll: true,
     disableFocus: false,
     awaitCloseAnimation: false,
   });
+
+
+  //DEFAULT HEADERS TEMPLATE
+  if($param_elem_default_template.length!==0){
+    if($param_elem_default_template.val()!=""){
+      
+      default_template = $param_elem_default_template.val();
+      default_template = JSON.parse(decodeURIComponent(default_template));
+
+    }
+  }
 
 
   var cellClassFormatter = function(cell, formatterParams, onRendered){
@@ -110,9 +133,6 @@ jQuery(document).ready(function ($) {
     },
     {
       label: function (component) {
-
-        console.log(component._column.definition)
-
         return !component._column.definition.htmlOutput
           ? "Mostrar columna"
           : "Ocultar columna";
@@ -127,7 +147,34 @@ jQuery(document).ready(function ($) {
         saveData(table);
         table.redraw();
       },
+      
     },
+
+    {
+      label: "Guardar como cabeceras por defecto",
+      action: function (e, column) {
+
+        var send_headers = table.getColumnDefinitions();
+
+        send_headers = encodeURIComponent(JSON.stringify(send_headers));
+
+          jQuery.ajax({
+            type: "post",
+            url: ajax_var.url,
+            dataType : 'json',
+            data:{
+              action:ajax_var.action,
+              nonce:ajax_var.nonce,
+              headers:send_headers
+            },
+            success: function(result){
+              saveData(table)
+            }
+          });
+      },
+    },
+
+
   ];
 
   var rowContextMenu = [
@@ -193,6 +240,9 @@ jQuery(document).ready(function ($) {
     dataLoaded: function () {
       saveData(this);
     },
+    tableBuilt: function(){
+      saveData(this);
+    }
   });
 
   //Add row on "Add Row" button click
@@ -223,15 +273,9 @@ jQuery(document).ready(function ($) {
     table.deleteRow(table.getSelectedData().map((x) => x.id));
     saveData(table);
   });
+
   $("#savedata").click(function () {
     console.log(saveData(table))
-  });
-  $("body").on("blur", "textarea", function () {
-    var id = parseInt($(this).attr("data-rel"));
-
-    var row = table.getRow(id);
-    //row.update({ extra: $(this).val() });
-    saveData(table);
   });
 
   $("input:file").change(function () {
@@ -295,8 +339,6 @@ jQuery(document).ready(function ($) {
 
       var formated_headers = [];
 
-      console.log(saved_headers);
-
       $.each(saved_headers,function(i,x){
         //TEXTO
         if(x.field.search('texto')!==-1){
@@ -319,7 +361,15 @@ jQuery(document).ready(function ($) {
 
   function loadData(test = true) {
     var databag = {};
-    var dummy = JSON.stringify({headers:[],data:[{}]})
+    var dummy = '';
+
+    //Comprobamos si hay cabeceras establecidas por defecto (orden, nombre, visibilidad...), si las hay las usamos y si no las cargamos vacías para que se use las que hemos hardwired
+    if(default_template!=""){
+      dummy = JSON.stringify({headers:default_template,data:[{texto_plato:"",texto_desc:"",number_precio1:"",number_precio2:""}]})
+    }else{
+      dummy = JSON.stringify({headers:[],data:[{texto_plato:"",texto_desc:"",number_precio1:"",number_precio2:""}]})
+    }
+
 
     //CARGA DE DATOS
     if (!test) {
@@ -332,6 +382,8 @@ jQuery(document).ready(function ($) {
     databag = JSON.parse(databag);
 
     databag.headers = databag.headers.filter(x=>x.editor!=false);
+
+
     databag.headers =  loadHeaders(databag.headers);
 
     databag.data = databag.data.map((x) =>
@@ -429,8 +481,6 @@ jQuery(document).ready(function ($) {
       $param_elem.attr("value", encodeURIComponent(data_result));
       $param_elem_table.attr("value", data_html);
     }
-
-   //console.log("data!",data_result);
 
     return data_result;
   }

@@ -31,6 +31,7 @@ if (!class_exists('VcDishesBlock')) {
                         "param_name" => "data_dishes_block",
                         "value" => '',
                     ),
+
                     array(
                         "type" => "data_dishes_block_table",
                         "holder" => "div",
@@ -47,7 +48,6 @@ if (!class_exists('VcDishesBlock')) {
                       'description'   => __( 'Enter element ID (Note: make sure it is unique and valid).', 'sodawebmedia' ),
                       'group'         => __( 'Opciones de Diseño', 'wpbakery_reextras'),
                   ),
-      
                   array(
                       'type'          => 'textfield',
                       'heading'       => __( 'Clase CSS extra', 'wpbakery_reextras' ),
@@ -153,6 +153,8 @@ if (!class_exists('VcDishesBlock')) {
         <button id='delete-row'>Delete row</button>
 
         <div id='data_dishes_block_table'></div>
+
+        <input value='" . esc_attr(get_option("wpbakery_dishes_block_default_template")) . "' type='hidden' name='data_dishes_block_default_template'>
 
         <input value='" . esc_attr($value) . "' type='hidden' name='" . esc_attr($settings['param_name']) . "' class='wpb_vc_param_value wpb-textinput " . esc_attr($settings['param_name']) . " " . esc_attr($settings['type']) . "_field'>
     ";
