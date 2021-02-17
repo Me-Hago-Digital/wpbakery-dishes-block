@@ -56,6 +56,17 @@ if (!class_exists('VcDishesBlock')) {
                       'description'   => __( 'Style particular content element differently - add a class name and refer to it in custom CSS.', 'sodawebmedia' ),
                       'group'         => __( 'Opciones de Diseño', 'wpbakery_reextras'),
                   ),   
+                  
+                  array(
+                    'type' => 'animation_style',
+                    'heading' => __( 'Animation Style', 'text-domain' ),
+                    'param_name' => 'animation',
+                    'description' => __( 'Choose your animation style', 'text-domain' ),
+                    'admin_label' => false,
+                    'weight' => 0,
+                    'group' => __( 'Opciones de Diseño', 'wpbakery_reextras'),
+                  ),
+
 
                 ),
 
@@ -72,10 +83,14 @@ if (!class_exists('VcDishesBlock')) {
                 'data_dishes_block'   => '',
                 'extra_class'   => '',
                 'element_id'   => '',
+                'animation' => '',
             ), $atts));
 
             $extra_class = esc_attr($atts['extra_class']);
             $element_id = esc_attr($atts['element_id']);
+
+            // Build the animation classes
+            $animation_classes = $this->getCSSAnimation( $atts['animation'] );
 
             $result = $atts['data_dishes_block'];
             $data = json_decode(urldecode($result));

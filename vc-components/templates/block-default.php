@@ -1,4 +1,4 @@
-<div class="cartas <?= $extra_class;?>" id="<?= $element_id;?>">
+<div class="cartas <?= $extra_class.' '.$animation_classes;?>" id="<?= $element_id;?>">
 
     <div class="carta-row carta-title">
 
