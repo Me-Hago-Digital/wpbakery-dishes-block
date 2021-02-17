@@ -27,7 +27,7 @@ if (!class_exists('VcDishesBlock')) {
                     array(
                         "type" => "data_dishes_block",
                         "class" => "",
-                        "heading" => __("Listado de platos", "js_composer"),
+                        "heading" => __("Listado de platos", "wpbakery_reextras"),
                         "param_name" => "data_dishes_block",
                         "value" => '',
                     ),
@@ -38,6 +38,25 @@ if (!class_exists('VcDishesBlock')) {
                         "param_name" => "content",
                         "value" => '',
                     ),
+
+                    array(
+                      'type'          => 'textfield',
+                      'heading'       => __( 'ID del elemento', 'wpbakery_reextras' ),
+                      'param_name'    => 'element_id',
+                      'value'             => __( '', 'wpbakery_reextras' ),
+                      'description'   => __( 'Enter element ID (Note: make sure it is unique and valid).', 'sodawebmedia' ),
+                      'group'         => __( 'Opciones de Diseño', 'wpbakery_reextras'),
+                  ),
+      
+                  array(
+                      'type'          => 'textfield',
+                      'heading'       => __( 'Clase CSS extra', 'wpbakery_reextras' ),
+                      'param_name'    => 'extra_class',
+                      'value'             => __( '', 'wpbakery_reextras' ),
+                      'description'   => __( 'Style particular content element differently - add a class name and refer to it in custom CSS.', 'sodawebmedia' ),
+                      'group'         => __( 'Opciones de Diseño', 'wpbakery_reextras'),
+                  ),   
+
                 ),
 
             ));
@@ -51,7 +70,12 @@ if (!class_exists('VcDishesBlock')) {
 
             $atts = (shortcode_atts(array(
                 'data_dishes_block'   => '',
+                'extra_class'   => '',
+                'element_id'   => '',
             ), $atts));
+
+            $extra_class = esc_attr($atts['extra_class']);
+            $element_id = esc_attr($atts['element_id']);
 
             $result = $atts['data_dishes_block'];
             $data = json_decode(urldecode($result));
