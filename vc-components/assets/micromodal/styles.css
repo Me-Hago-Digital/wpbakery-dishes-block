@@ -10,6 +10,16 @@
   Basic Modal Styles
 \**************************/
 
+#modal-copypaste-content{
+  outline: dashed rgba(0,0,0,.8);
+  padding: 15px;
+}
+
+#modal-copypaste-content p{
+  margin:0;
+}
+
+
 .modal {
     font-family: -apple-system,BlinkMacSystemFont,avenir next,avenir,helvetica neue,helvetica,ubuntu,roboto,noto,segoe ui,arial,sans-serif;
   }
@@ -61,8 +71,6 @@
   .modal__header .modal__close:before { content: "\2715"; }
   
   .modal__content {
-    margin-top: 2rem;
-    margin-bottom: 2rem;
     line-height: 1.5;
     color: rgba(0,0,0,.8);
   }

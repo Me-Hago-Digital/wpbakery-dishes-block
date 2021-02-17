@@ -16,7 +16,7 @@ function update_dishes_block_default_template() {
     // Check for nonce security
     $nonce = sanitize_text_field( $_POST['nonce'] );
 
-    if ( ! wp_verify_nonce( $nonce, 'my-ajax-nonce' ) && $nonce != "ABCDEF" ) {
+    if ( ! wp_verify_nonce( $nonce, 'my-ajax-nonce' )) {
         die ( 'Busted!');
     }
 

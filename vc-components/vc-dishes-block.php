@@ -124,7 +124,17 @@ if (!class_exists('VcDishesBlock')) {
     function data_dishes_block_settings_field($settings, $value){
         return "
 
-
+        <div class='modal micromodal-slide' id='modal-copypaste' aria-hidden='true'>
+        <div class='modal__overlay' tabindex='-1' data-micromodal-close>
+          <div class='modal__container' role='dialog' aria-modal='true' aria-labelledby='modal-copypaste-title'>
+            <main class='modal__content' id='modal-copypaste-content'>
+              <p style='font-size: 26px;font-weight: bold;color: rgba(0,0,0,.7);'>Ctrl+V</p>
+              <p>Haz click aquí</p>
+            </main>
+          </div>
+        </div>
+      </div>
+    
         <div class='modal micromodal-slide' id='modal-settings' aria-hidden='true'>
         <div class='modal__overlay' tabindex='-1' data-micromodal-close>
           <div class='modal__container' role='dialog' aria-modal='true' aria-labelledby='modal-settings-title'>
@@ -151,6 +161,9 @@ if (!class_exists('VcDishesBlock')) {
 
         <button id='add-row'>Add row</button>
         <button id='delete-row'>Delete row</button>
+
+        <input id='dishes-block-files' type='file' style='display:none'>
+
 
         <div id='data_dishes_block_table'></div>
 
