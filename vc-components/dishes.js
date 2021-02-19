@@ -69,7 +69,7 @@ jQuery(document).ready(function ($) {
       editableTitle: true,
       headerContextMenu: headerContextMenu,
       formatter: cellClassFormatter,
-      editor: "input",
+      editor: "textarea",
     };
   }
 
