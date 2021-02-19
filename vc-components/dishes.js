@@ -1,4 +1,4 @@
-var dummy_data = "";
+var dummy_data = '{"headers":[{"field":"handler","titleFormatter":"rowSelection","width":10,"headerSort":false,"rowHandle":true,"htmlOutput":false,"editor":false,"formatter":"handle","clipboard":false},{"title":"Plato","field":"texto_plato","headerSort":false,"htmlOutput":true,"editor":"input","editableTitle":true,"headerContextMenu":[{"label":"Ordenar columna","menu":[{"label":"ASC"},{"label":"DESC"}]},{"disabled":true,"label":"Eliminar columna"},{},{"label":"Guardar como cabeceras por defecto"}]},{"title":"Descripción","field":"texto_desc","headerSort":false,"htmlOutput":true,"editor":"input","editableTitle":true,"headerContextMenu":[{"label":"Ordenar columna","menu":[{"label":"ASC"},{"label":"DESC"}]},{"disabled":true,"label":"Eliminar columna"},{},{"label":"Guardar como cabeceras por defecto"}]},{"title":"Ración","field":"number_precio1","headerSort":false,"htmlOutput":true,"editor":"input","editableTitle":true,"width":100,"headerContextMenu":[{"label":"Ordenar columna","menu":[{"label":"ASC"},{"label":"DESC"}]},{"disabled":true,"label":"Eliminar columna"},{},{"label":"Guardar como cabeceras por defecto"}]},{"title":"½ Ración","field":"number_precio2","headerSort":false,"htmlOutput":true,"editor":"input","editableTitle":true,"width":100,"headerContextMenu":[{"label":"Ordenar columna","menu":[{"label":"ASC"},{"label":"DESC"}]},{"disabled":true,"label":"Eliminar columna"},{},{"label":"Guardar como cabeceras por defecto"}]}],"data":[{"id":1,"subtable":false},{"texto_plato":"1A","texto_desc":"2A","number_precio1":"3A","number_precio2":"4A","id":2},{"texto_plato":"1B","texto_desc":"2B","number_precio1":"3B","number_precio2":"4B","id":3},{"texto_plato":"1C","texto_desc":"2C","number_precio1":"3C","number_precio2":"4C","id":4},{"texto_plato":"1A","texto_desc":"2A","number_precio1":"3A","number_precio2":"4A","id":5},{"texto_plato":"1B","texto_desc":"2B","number_precio1":"3B","number_precio2":"4B","id":6},{"texto_plato":"1C","texto_desc":"2C","number_precio1":"3C","number_precio2":"4C","id":7},{"texto_plato":"1A","texto_desc":"2A","number_precio1":"3A","number_precio2":"4A","id":8},{"texto_plato":"1B","texto_desc":"2B","number_precio1":"3B","number_precio2":"4B","id":9},{"texto_plato":"1C","texto_desc":"2C","number_precio1":"3C","number_precio2":"4C","id":10},{"texto_plato":"1A","texto_desc":"2A","number_precio1":"3A","number_precio2":"4A","id":11},{"texto_plato":"1B","texto_desc":"2B","number_precio1":"3B","number_precio2":"4B","id":12},{"texto_plato":"1C","texto_desc":"2C","number_precio1":"3C","number_precio2":"4C","id":13}]}';
 
 jQuery(document).ready(function ($) {
   var current_selected_row;
@@ -9,7 +9,7 @@ jQuery(document).ready(function ($) {
 
       if (data_clip != false) {
         var position = table.getRowPosition(current_selected_row, true);
-        table.addData(data_clip, false, position);
+        table.addData(data_clip, false);
         saveData(table);
       }
 
@@ -97,7 +97,24 @@ jQuery(document).ready(function ($) {
   };
 
   var headerContextMenu = [
-
+    {
+      disabled: function (component) {
+        return table.getHistoryUndoSize()===0;
+      },
+      label: "Deshacer",
+      action: function (e, row) {
+        table.undo();
+      },
+    },
+    {
+      disabled: function (component) {
+        return table.getHistoryRedoSize()===0;
+      },
+      label: "Rehacer",
+      action: function (e, row) {
+        table.redo();
+      },
+    },
 
     {
       label: "Ordenar columna",
@@ -184,10 +201,50 @@ jQuery(document).ready(function ($) {
   ];
 
   var rowContextMenu = [
+
+    {
+      disabled: function (component) {
+        return table.getHistoryUndoSize()===0;
+      },
+      label: "Deshacer",
+      action: function (e, row) {
+        table.undo();
+      },
+    },
+    {
+      disabled: function (component) {
+        return table.getHistoryRedoSize()===0;
+      },
+      label: "Rehacer",
+      action: function (e, row) {
+        table.redo();
+      },
+    },
+
+    {
+      label: "Copiar",
+      action: function (e, row) {
+        table.copyToClipboard("selected");
+      },
+    },
     {
       label: "Eliminar fila",
       action: function (e, row) {
-        table.deleteRow(row.getData().id);
+
+        if(table.getSelectedRows().length!=0){
+          table.deleteRow(table.getSelectedRows());
+        }else{
+          table.deleteRow(row.getData().id);
+        }
+
+        if(!table.getDataCount()>0){
+          table.addRow({id:1});
+        }else{
+          saveData(table);
+        }
+
+
+
       },
     },
     {
@@ -240,6 +297,18 @@ jQuery(document).ready(function ($) {
     movableColumns: true,
     columnHeaderSortMulti: false,
     clipboardPasteAction: "insert",
+    clipboard:true,
+    clipboardCopyRowRange:"selected",
+    clipboardCopyStyled:false,
+    history:true,
+    clipboardCopyConfig:{
+      columnHeaders:false, //do not include column headers in clipboard output
+      columnGroups:false, //do not include column groups in column headers for printed table
+      rowGroups:false, //do not include row groups in clipboard output
+      columnCalcs:false, //do not include column calculation rows in clipboard output
+      dataTree:false, //do not include data tree in printed table
+      formatCells:false, //show raw cell values without formatter
+  },
 
     cellEdited: function (data) {
       saveData(this);
@@ -326,24 +395,17 @@ jQuery(document).ready(function ($) {
     var min_headers = [
       {
         field: "handler",
+        titleFormatter: "rowSelection",
         width: 10,
         headerSort: false,
         rowHandle: true,
         htmlOutput: false,
         editor: false,
         formatter: "handle",
-      },
-
-      {
-        formatter: "rowSelection",
-        titleFormatter: "rowSelection",
-        headerSort: false,
+        clipboard:false,
         cellClick: function (e, cell) {
-          cell.getRow().toggleSelect();
-        },
-        width: 10,
-        htmlOutput: false,
-        editor: false,
+           cell.getRow().toggleSelect();
+         },
       },
     ];
 
@@ -455,7 +517,7 @@ jQuery(document).ready(function ($) {
     var headers = lines[0].split(",");
 
     for (var i = 1; i < lines.length; i++) {
-      var _colHeaders_i = 2;
+      var _colHeaders_i = 1;
 
       var obj = {};
       var currentline = lines[i].split(",");
@@ -477,14 +539,18 @@ jQuery(document).ready(function ($) {
   function clipboardPasteParser(clipboard, table) {
     var _colHeaders = table.columnManager.columns.map((x) => x.field);
 
-    clipboard = clipboard.split("\n");
+
+    clipboard2 = splitNewLine(clipboard);
+
+
     var data = [];
 
-    $.each(clipboard, function (i, clip) {
-      var _colHeaders_i = 2;
+    $.each(clipboard2, function (i, row) {
+      var _colHeaders_i = 1;
       var clipdata = {};
+      
 
-      $.each(clip.split("\t"), function (x, tab) {
+      $.each(row, function (x, tab) {
         if (typeof _colHeaders[_colHeaders_i] !== "undefined") {
           (clipdata[_colHeaders[_colHeaders_i]] = tab), (_colHeaders_i += 1);
         }
@@ -540,4 +606,57 @@ jQuery(document).ready(function ($) {
       }, 100);
     }
   }
+
+  function splitNewLine(str){
+
+    var myregexp = /(?:(\t)|(\r?\n)|"((?:[^"]+|"")*)"|([^\t\r\n]+))/ig;
+    var match = myregexp.exec(str);
+    var emptyRow = [];
+    var row = emptyRow.slice();
+    var rows = [];
+    var prevTab = false;
+    while (match != null) {
+      if (match[4]) {
+        // Unquoted data
+        row.push(match[4]);
+        prevTab = false;
+      } else if (match[3]) {
+        // Quoted data (replace escaped double quotes with single)
+        row.push(match[3].replace(/""/g, "'"));
+        prevTab = false;
+      } else if (match[1]) {
+        // Tab seperator
+        if (prevTab) {
+          // Two tabs means empty data
+          row.push('');
+        }
+        prevTab = true;
+      } else if (match[2]) {
+        // End of the row
+        if (prevTab) {
+          // Previously had a tab, so include the empty data
+          row.push('');
+        }
+        prevTab = false;
+        rows.push(row);
+        
+        // Here we are ensuring the new empty row doesn't reference the old one.
+        row = emptyRow.slice();
+      }
+      match = myregexp.exec(str);
+    }
+    
+    // Handles missing new line at end of string
+    if (row.length) {
+      if (prevTab) {
+        // Previously had a tab, so include the empty data
+        row.push('');
+      }
+      rows.push(row);
+    }
+  
+    return rows;
+  
+  }
+
 });
