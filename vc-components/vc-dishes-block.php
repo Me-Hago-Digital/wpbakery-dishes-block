@@ -157,10 +157,6 @@ if (!class_exists('VcDishesBlock')) {
         </div>
       </div>
 
-
-        <button id='add-row'>Add row</button>
-        <button id='delete-row'>Delete row</button>
-
         <input id='dishes-block-files' type='file' style='display:none'>
 
 
