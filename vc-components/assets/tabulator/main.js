@@ -1,7 +1,4 @@
 (function($) {
-    console.log("main2",vc)
-
-    
     window.VcCustomElementView = vc.shortcode_view.extend( {
         elementTemplate: false,
         $wrapper: false,
@@ -22,7 +19,5 @@
             }
         }
     } );
-
-    console.log("main3")
 
 })(window.jQuery)
